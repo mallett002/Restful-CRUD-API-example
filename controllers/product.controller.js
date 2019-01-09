@@ -101,3 +101,23 @@ exports.update = (req, res) => {
 }
 
 // Delete a note with the specified noteId in the request
+exports.delete = (req, res) => {
+    Product.findByIdAndRemove(req.params.productId)
+        .then(product => {
+            if (!product) {
+                return res.status(404).send({
+                    message: `Product not found with id ${req.params.productId}`
+                });
+            }
+            return res.send({message: "Product deleted successfully!"});
+        }).catch(err => {
+            if (err.kind === "ObjectId" || err.name === "NotFound") {
+                return res.status(404).send({
+                    message: `Product not found with id ${req.params.productId}`
+                });
+            }
+            return res.status(500).send({
+                message: `Could not delete product with id ${req.params.productId}`
+            });
+        });
+}
