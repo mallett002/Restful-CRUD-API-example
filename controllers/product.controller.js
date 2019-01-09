@@ -65,6 +65,39 @@ exports.findOne = (req, res) => {
 
 // Update a product
 exports.update = (req, res) => {
-    // TODO - check if has body, handle if empty
-    // TODO - find by id and update
+
+    // Validate req
+    if (!req.body) {
+        return res.status(400).send({
+            message: "Product content can not be empty"
+        });
+    }
+
+    // Find and update product with req body
+    Product.findByIdAndUpdate(req.params.productId, {
+        title: req.body.title || "No product title",
+        description: req.body.description,
+        price: req.body.price,
+        company: req.body.company
+    }, {new: true}) // true to return modified doc rather than original
+    .then(product => {
+        if (!product) {
+            return res.status(404).send({
+                message: `Product not found with id ${req.params.productId}`
+            });
+        }
+        return res.send(product);
+    }).catch(err => {
+        if (err.kind === "ObjectId") {
+            return res.status(404).send({
+                message: `Product not found with id ${req.params.productId}`
+            });
+        }
+        return res.status(500).send({
+            message: `Something went wrong updating
+             product with id ${req.params.productId}`
+        });
+    });
 }
+
+// Delete a note with the specified noteId in the request
