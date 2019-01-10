@@ -7,9 +7,20 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false })); // to use the queryString library
 app.use(bodyParser.json()); // to only parse json
 
+// Enable CORS for all HTTP methods
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
 // Configure the database
 const config = require('./config.js');
 const mongoose = require('mongoose');
+
+// call product.routes, passing it the app
+require('./product.routes.js')(app);
 
 // used to plugin own promise library
 mongoose.Promise = global.Promise;
